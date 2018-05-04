@@ -1032,7 +1032,7 @@ parse_specifier (GLogItem * logitem, char **str, const char *p, const char *end)
   const char *dfmt = conf.date_format;
   const char *tfmt = conf.time_format;
 
-  char *pch, *sEnd, *bEnd, *tkn = NULL;
+  char *pch, *sEnd, *bEnd, *tkn, *datetime = NULL;
   double serve_secs = 0.0;
   uint64_t bandw = 0, serve_time = 0;
   long status = 0L;
@@ -1050,11 +1050,25 @@ parse_specifier (GLogItem * logitem, char **str, const char *p, const char *end)
     if (!(tkn = parse_string (&(*str), end, count_matches (dfmt, ' ') + 1)))
       return spec_err (logitem, SPEC_TOKN_NUL, *p, NULL);
 
-    if (str_to_time (tkn, dfmt, &tm) != 0 || set_date (&logitem->date, tm) != 0) {
-      spec_err (logitem, SPEC_TOKN_INV, *p, tkn);
+    if (!logitem->time) {
+      logitem->date = tkn;
+      return 0;
+    }
+
+    datetime = make_datetime (tkn, logitem->time);
+    free (logitem->time);
+
+    if (!conf.datetime_format)
+      conf.datetime_format = make_datetime (dfmt, tfmt);
+
+    if (str_to_time (datetime, conf.datetime_format, &tm) != 0
+        || set_date (&logitem->date, tm) != 0
+        || set_time (&logitem->time, tm) != 0) {
+      spec_err (logitem, SPEC_TOKN_INV, *p, datetime);
       free (tkn);
       return 1;
     }
+    free (datetime);
     free (tkn);
     break;
     /* time */
@@ -1064,11 +1078,25 @@ parse_specifier (GLogItem * logitem, char **str, const char *p, const char *end)
     if (!(tkn = parse_string (&(*str), end, 1)))
       return spec_err (logitem, SPEC_TOKN_NUL, *p, NULL);
 
-    if (str_to_time (tkn, tfmt, &tm) != 0 || set_time(&logitem->time, tm) != 0) {
-      spec_err (logitem, SPEC_TOKN_INV, *p, tkn);
+    if (!logitem->date) {
+      logitem->time = tkn;
+      return 0;
+    }
+
+    datetime = make_datetime (logitem->date, tkn);
+    free (logitem->date);
+
+    if (!conf.datetime_format)
+      conf.datetime_format = make_datetime (dfmt, tfmt);
+
+    if (str_to_time (datetime, conf.datetime_format, &tm) != 0
+        || set_date (&logitem->date, tm) != 0
+        || set_time (&logitem->time, tm) != 0) {
+      spec_err (logitem, SPEC_TOKN_INV, *p, datetime);
       free (tkn);
       return 1;
     }
+    free (datetime);
     free (tkn);
     break;
     /* date/time as decimal, i.e., timestamps, ms/us  */

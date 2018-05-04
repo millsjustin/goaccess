@@ -113,6 +113,7 @@ typedef struct GConf_
   char *spec_date_time_format;      /* date format w/ specificity */
   char *spec_date_time_num_format;  /* numeric date format w/ specificity */
   char *log_format;                 /* log format */
+  char *datetime_format;
 
   const char *debug_log;            /* debug log path */
   const char *geoip_database;       /* geoip db path */

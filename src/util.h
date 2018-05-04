@@ -88,6 +88,7 @@ int valid_output_type (const char *filename);
 off_t file_size (const char *filename);
 uint32_t ip_to_binary (const char *ip);
 void append_str (char **dest, const char *src);
+char *make_datetime (char const *date, const char *time);
 void genstr(char *dest, size_t len);
 void strip_newlines (char *str);
 void xstrncpy (char *dest, const char *source, const size_t dest_size);

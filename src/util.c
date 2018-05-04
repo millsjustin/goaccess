@@ -907,6 +907,22 @@ append_str (char **dest, const char *src)
   *dest = str;
 }
 
+/* Allocate a datetime string separated by a colon like: date:time */
+char *
+make_datetime (char const *date, const char *time)
+{
+  size_t date_len = strlen (date);
+  size_t time_len = strlen (time);
+  size_t datetime_len = date_len + time_len + 1;
+
+  char *datetime = xmalloc (datetime_len + 1);
+  memcpy (datetime, date, date_len);
+  datetime[date_len] = ':';
+  memcpy (datetime + date_len + 1, time, time_len);
+  datetime[datetime_len] = '\0';
+  return datetime;
+}
+
 /* Escapes the special characters, e.g., '\n', '\r', '\t', '\'
  * in the string source by inserting a '\' before them.
  *
