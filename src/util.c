@@ -909,7 +909,7 @@ append_str (char **dest, const char *src)
 
 /* Allocate a datetime string separated by a colon like: date:time */
 char *
-make_datetime (char const *date, const char *time)
+make_datetime (const char *date, const char *time)
 {
   size_t date_len = strlen (date);
   size_t time_len = strlen (time);
